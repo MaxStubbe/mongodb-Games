@@ -5,6 +5,7 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Game = require('../model/game.model');
+var Character = require('../model/characters.model');
 
 //
 // Geef een lijst van alle games.
@@ -20,7 +21,7 @@ routes.get('/games', function(req, res) {
 });
 
 //
-// Retourneer één specifieke games. Hier maken we gebruik van URL parameters.
+// Retourneer één specifieke game. Hier maken we gebruik van URL parameters.
 // Vorm van de URL: http://hostname:3000/api/v1/games/23
 //
 routes.get('/games/:id', function(req, res) {
@@ -29,6 +30,35 @@ routes.get('/games/:id', function(req, res) {
         .then((game) => {
             // console.log(games);
             res.status(200).json(game);
+        })
+        .catch((error) => res.status(401).json(error));
+});
+
+//
+//return van een specifieke game alle characters
+// vorm van de url : http://hostname:3000/api/v1/games/23/characters
+//
+routes.get('/games/:id/characters', function(req, res) {
+    res.contentType('application/json');
+    Game.findById(req.params.id)
+        .populate('characters')
+        .then((game) => {
+            characters = game.characters;
+            res.status(200).json(characters);
+        })
+        .catch((error) => res.status(401).json(error));
+});
+
+routes.get('/games/:id/characters/:cid', function(req, res) {
+    res.contentType('application/json');
+    Game.findById(req.params.id)
+        .populate('characters')
+        .then((game) => {
+            Character.findById(req.params.cid)
+            .then((character) => { 
+                res.status(200).json(character);
+            })
+            .catch((error) => res.status(401).json(error));
         })
         .catch((error) => res.status(401).json(error));
 });
@@ -60,7 +90,8 @@ routes.put('/games/:id', function(req, res) {
 
     var update = { 
         "name" : req.body.name, 
-        "description" : req.body.description
+        "description" : req.body.description,
+        "imagePath" : req.body.imagePath
     };
 
     Game.findById(id)
