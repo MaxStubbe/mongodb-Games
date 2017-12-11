@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const connection = require('../config/mongo.db');
 
 const Character = require('./characters.model');
-const GameDeveloper = require('./gameDeveloper.model');
+const Developer = require('./developer.model');
 
 const Schema = mongoose.Schema;
 
@@ -11,13 +11,14 @@ const GameSchema = new Schema({
     name: String,
     description: String,
     imagePath: String,
+    genres: [String],
     characters: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'character'
     }],
-    gameDevelopers: [{
+    developers: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'gamedeveloper'
+        ref: 'developer'
     }]
 });
 

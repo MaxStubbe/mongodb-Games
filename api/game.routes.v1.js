@@ -64,6 +64,35 @@ routes.get('/games/:id/characters/:cid', function(req, res) {
 });
 
 //
+//return van een specifieke game alle characters
+// vorm van de url : http://hostname:3000/api/v1/games/23/characters
+//
+routes.get('/games/:id/developers', function(req, res) {
+    res.contentType('application/json');
+    Game.findById(req.params.id)
+        .populate('developers')
+        .then((game) => {
+            developers = game.developers;
+            res.status(200).json(developers);
+        })
+        .catch((error) => res.status(401).json(error));
+});
+
+routes.get('/games/:id/developers/:did', function(req, res) {
+    res.contentType('application/json');
+    Game.findById(req.params.id)
+        .populate('developers')
+        .then((game) => {
+            Developer.findById(req.params.cid)
+            .then((developer) => { 
+                res.status(200).json(developer);
+            })
+            .catch((error) => res.status(401).json(error));
+        })
+        .catch((error) => res.status(401).json(error));
+});
+
+//
 // Voeg een game toe. De nieuwe info wordt gestuurd via de body van de request message.
 // Vorm van de URL: POST http://hostname:3000/api/v1/games
 //
@@ -91,7 +120,8 @@ routes.put('/games/:id', function(req, res) {
     var update = { 
         "name" : req.body.name, 
         "description" : req.body.description,
-        "imagePath" : req.body.imagePath
+        "imagePath" : req.body.imagePath,
+        "genres": req.body.genres
     };
 
     Game.findById(id)
